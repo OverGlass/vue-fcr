@@ -74,6 +74,14 @@ export default class VueFormCondionnalRendering extends Vue {
           placeholder: 'Enter text type here',
           value: '',
           conditionnal: { ofInput: 1, inCase: { operator: '==', value: 'test2' } }
+        },
+        {
+          id: 3,
+          type: 'text',
+          label: 'Text Field',
+          placeholder: 'Enter text type here',
+          value: '',
+          conditionnal: { ofInput: 2, inCase: { operator: '==', value: 'test3' } }
         }
       ]
   })
@@ -122,29 +130,31 @@ export default class VueFormCondionnalRendering extends Vue {
   get flow () {
     return this.fieldsInfos
       // On map une première fois pour checker les call sur les conditions et les standalones
-      .map((field, index) => {
+      .map((field, index, arr) => {
         const conditionnal = field.conditionnal
+        const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
+        const thisIsCall = conditionnal
+          ? this.operator(
+                this.storeResult[conditionnal.ofInput],
+                conditionnal.inCase.operator,
+                conditionnal.inCase.value
+              )
+          : false
+        const relatedIsCall = (related && related.conditionnal)
+          ?  this.operator(
+                this.storeResult[related.conditionnal.ofInput],
+                related.conditionnal.inCase.operator,
+                related.conditionnal.inCase.value
+              )
+          : false
         return {
           ...field,
           order: index,
           isCall: (conditionnal)
-            ? this.operator(
-                this.storeResult[conditionnal.ofInput],
-                conditionnal.inCase.operator,
-                conditionnal.inCase.value
-              ) 
+            ? thisIsCall && ((related && related.conditionnal)
+                ? relatedIsCall
+                : thisIsCall)
             : true
-        }
-      })
-      // On map une deuxième fois pour savoir si le field parent est déjà appelé.
-      .map((field, key, arr) => {
-        const conditionnal = field.conditionnal
-        const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
-        return {
-          ...field,
-          isCall: (related)
-            ? field.isCall && related.isCall
-            : field.isCall
         }
       })
       // .sort((a, b) => (a.conditionnal - b.conditionnal || b.is_conditionnal - a.is_conditionnal || a.order - b.order ))
