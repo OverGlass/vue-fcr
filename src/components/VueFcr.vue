@@ -17,6 +17,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import _find from 'lodash/find'
 import _pick from 'lodash/pick'
 import _isArray from 'lodash/isArray'
+import { throws } from 'assert';
 
   interface inCase {
     operator: string
@@ -126,6 +127,20 @@ export default class VueFormCondionnalRendering extends Vue {
       }
     })
   }
+
+  getConditionnalParams ({conditionnal}:FieldObject): Array<any> | null {
+    return (conditionnal)
+      ? [
+        this.storeResult[conditionnal.ofInput],
+        conditionnal.inCase.operator,
+        conditionnal.inCase.value
+      ]
+      : null
+  }
+
+  isFieldCall (field:FieldObject) {
+    return this.operator.apply(this, this.getConditionnalParams(field))
+  }
   
   get flow () {
     return this.fieldsInfos
@@ -133,20 +148,8 @@ export default class VueFormCondionnalRendering extends Vue {
       .map((field, index, arr) => {
         const conditionnal = field.conditionnal
         const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
-        const thisIsCall = conditionnal
-          ? this.operator(
-                this.storeResult[conditionnal.ofInput],
-                conditionnal.inCase.operator,
-                conditionnal.inCase.value
-              )
-          : false
-        const relatedIsCall = (related && related.conditionnal)
-          ?  this.operator(
-                this.storeResult[related.conditionnal.ofInput],
-                related.conditionnal.inCase.operator,
-                related.conditionnal.inCase.value
-              )
-          : false
+        const thisIsCall = conditionnal ? this.isFieldCall(field): false
+        const relatedIsCall = related ? this.isFieldCall(related) : false
         return {
           ...field,
           order: index,
