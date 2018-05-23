@@ -66,7 +66,7 @@ export default class VueFormCondionnalRendering extends Vue {
           label: 'Text Field',
           placeholder: 'Enter text type here',
           value: 'test2',
-          conditionnal: { ofInput: 0, inCase: { operator: '==', value: 'test' } }
+          conditionnal: { ofInput: 0, inCase: { operator: '===', value: 'test' } }
         },
         {
           id: 2,
@@ -74,7 +74,7 @@ export default class VueFormCondionnalRendering extends Vue {
           label: 'Text Field',
           placeholder: 'Enter text type here',
           value: '',
-          conditionnal: { ofInput: 1, inCase: { operator: '==', value: 'test2' } }
+          conditionnal: { ofInput: 1, inCase: { operator: '===', value: 'test2' } }
         },
         {
           id: 3,
@@ -82,7 +82,7 @@ export default class VueFormCondionnalRendering extends Vue {
           label: 'Text Field',
           placeholder: 'Enter text type here',
           value: '',
-          conditionnal: { ofInput: 2, inCase: { operator: '==', value: 'test3' } }
+          conditionnal: { ofInput: 2, inCase: { operator: '===', value: 'test3' } }
         }
       ]
   })
@@ -106,19 +106,15 @@ export default class VueFormCondionnalRendering extends Vue {
   }
   operator (value:any, op:string, b:any): boolean {
     if (!op) return true
-    if (!_isArray(value)) {
-      value = [value]
-    } else {
-      if (value.length !> 0) return false
-    }
+    if (!_isArray(value)) value = [value]
+    if (value.length === 0) return false
     return value.some((a:any) => {
       if (typeof a === 'string' && typeof b === 'string') {
-        a = slug(a.toLowerCase())
-        b = slug(b.toLowerCase())
+        a = slug(a)
+        b = slug(b)
       }
       switch (op) {
-        case '==': return a === b
-        case '~=': return (b.indexOf(a.length > 0 ? a : '#%#%#%#') >= 0)
+        case '===': return a === b
         case '>': return a > b
         case '>=': return a >= b
         case '<': return a < b
