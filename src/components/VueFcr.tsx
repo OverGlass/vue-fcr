@@ -158,15 +158,15 @@ export default class VueFormCondionnalRendering extends Vue {
     .map((field, index, arr) => {
       const conditionnal = field.conditionnal
       const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
-      const thisIsCall = conditionnal ? this.isFieldCall(field): false
+      const thisIsCall = conditionnal ? this.isFieldCall(field) : false
       const relatedIsCall = related ? this.isFieldCall(related) : false
       return {
         ...field,
         order: index,
         isCall: (conditionnal)
-          ? thisIsCall && ((related && related.conditionnal)
+          ? thisIsCall && (related && related.conditionnal)
             ? relatedIsCall
-            : thisIsCall)
+            : thisIsCall
           : true
       }
     })
