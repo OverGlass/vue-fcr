@@ -1,0 +1,1 @@
+export const varNameToString = (somefancyvariable:any):string => Object.keys({somefancyvariable})[0]

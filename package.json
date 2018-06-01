@@ -16,6 +16,11 @@
     "@vue/cli-plugin-babel": "^3.0.0-beta.11",
     "@vue/cli-plugin-typescript": "^3.0.0-beta.11",
     "@vue/cli-service": "^3.0.0-beta.11",
+    "babel": "^6.0.0",
+    "babel-helper-vue-jsx-merge-props": "^2.0.3",
+    "babel-plugin-jsx-v-model": "^2.0.3",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-transform-vue-jsx": "^6.18.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "vue-template-compiler": "^2.5.16"

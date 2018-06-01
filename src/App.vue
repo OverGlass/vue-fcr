@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import VueFcr from './components/VueFcr.vue';
+import VueFcr from './components/VueFcr';
 
 @Component({
   components: { VueFcr },

@@ -1,23 +1,8 @@
-<template>
-  <section>
-    <fieldset v-for="f in flow" :key="f.id" v-show="f.isCall">
-      <label :for="f.id"> {{ f.label }} </label>
-      <input
-        :id="f.id"
-        type="text"
-        v-model="storeResult[f.id]"
-        :placeholder="f.placeholder"
-      >
-    </fieldset>
-  </section>
-</template>
-
-<script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+// import { varNameToString } from '../lib'
 import _find from 'lodash/find'
 import _pick from 'lodash/pick'
 import _isArray from 'lodash/isArray'
-import { throws } from 'assert';
 
   interface inCase {
     operator: string
@@ -42,6 +27,7 @@ import { throws } from 'assert';
     [key:string]: any 
   }
 
+  declare type InputEvent = Event & {currentTarget: HTMLInputElement};
 
 const slug = (text:string):string => {
   return text.toString().toLowerCase()
@@ -54,6 +40,39 @@ const slug = (text:string):string => {
 
 @Component
 export default class VueFormCondionnalRendering extends Vue {
+
+  render (h:any) {
+    return (
+     <section>
+      {/* HEADER SLOT */}
+      { this.$slots.header}
+
+      {/* FORM CONDITIONAL RENDERING */
+        this.flow.map((f) => (
+        <div class="FcrContainer">
+          {/* FCR-HEADER SLOT */}
+          { this.$slots.fcrHeader }
+
+          <fieldset key={f.id} v-show={f.isCall}>
+            <label for={f.id}> { f.label } </label>
+            {
+              this.storeResult 
+                ? <input
+                    id={f.id}
+                    type="text"
+                    on-input={(e:InputEvent) => { this.storeResult[f.id] = e.currentTarget.value}}
+                    value={this.storeResult[f.id]}
+                    placeholder={f.placeholder} />
+                : null
+            }
+          </fieldset>
+        </div>
+        )
+        )
+      }
+     </section> 
+    )
+  }
   // --------------------- 
   // ------- PROPS -------
   @Prop({
@@ -91,9 +110,23 @@ export default class VueFormCondionnalRendering extends Vue {
   @Prop({ type: Array, default: () => [] })
   customInputs!: Array<object>
 
+  @Prop({ 
+    default: () => ({
+      classesName: {
+        main: 'Container',
+        header: 'Container-header'
+      }
+    }) 
+  })
+  config!: object
+
   // --------------------- 
   // ------- DATA --------
   storeResult:StoreResult = this.initStoreResult()
+
+  // ---------------------
+  // ------ utilities ----
+
 
   // --------------------- 
   // ------- METHODS -----
@@ -140,7 +173,7 @@ export default class VueFormCondionnalRendering extends Vue {
   
   get flow () {
     return this.fieldsInfos
-      // On map une première fois pour checker les call sur les conditions et les standalones
+      // On map une première fois pour definir isCall  
       .map((field, index, arr) => {
         const conditionnal = field.conditionnal
         const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
@@ -160,4 +193,3 @@ export default class VueFormCondionnalRendering extends Vue {
       
   }
 }
-</script>
