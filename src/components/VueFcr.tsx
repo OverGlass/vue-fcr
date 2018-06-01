@@ -52,78 +52,43 @@ const slug = (text:string):string => {
 @Component
 export default class VueFormCondionnalRendering extends Vue {
 
-  render (h:any) {
-    const { containerCls, formCls, formContainerCls, formContainerFieldSetCls } = this.config.classesName
-    return (
-     <section class={containerCls}>
-      {/* HEADER SLOT */}
-      { this.$slots.header}
-      
-      <form class={formCls}>
-        {/* FORM CONDITIONAL RENDERING */
-          this.flow.map((f) => (
-          <div class={formContainerCls}>
-            {/* FCR-HEADER SLOT */}
-            { this.$slots.inputHeader }
-
-            <fieldset key={f.id} v-show={f.isCall}  class={formContainerFieldSetCls}>
-              <label for={f.id}> { f.label } </label>
-              {
-                this.storeResult 
-                  ? <input
-                      id={f.id}
-                      type="text"
-                      on-input={(e:InputEvent) => { this.storeResult[f.id] = e.currentTarget.value}}
-                      value={this.storeResult[f.id]}
-                      placeholder={f.placeholder} />
-                  : null
-              }
-            </fieldset>
-          </div>
-          ))
-        }
-      </form>
-        { this.$slots.footer} 
-     </section> 
-    )
-  }
   // --------------------- 
   // ------- PROPS -------
   @Prop({
     type: Array,
     default: () => [
-        { id: 0, type: 'text', label: 'Text Field', placeholder: 'Enter text type here', value: '', conditionnal: false },
-        {
-          id: 1,
-          type: 'text',
-          label: 'Text Field',
-          placeholder: 'Enter text type here',
-          value: 'test2',
-          conditionnal: { ofInput: 0, inCase: { operator: '===', value: 'test' } }
-        },
-        {
-          id: 2,
-          type: 'text',
-          label: 'Text Field',
-          placeholder: 'Enter text type here',
-          value: '',
-          conditionnal: { ofInput: 1, inCase: { operator: '===', value: 'test2' } }
-        },
-        {
-          id: 3,
-          type: 'text',
-          label: 'Text Field',
-          placeholder: 'Enter text type here',
-          value: '',
-          conditionnal: { ofInput: 2, inCase: { operator: '===', value: 'test3' } }
-        }
-      ]
+      { id: 0, type: 'text', label: 'Text Field', placeholder: 'Enter text type here', value: '', conditionnal: false },
+      {
+        id: 1,
+        type: 'text',
+        label: 'Text Field',
+        placeholder: 'Enter text type here',
+        value: 'test2',
+        conditionnal: { ofInput: 0, inCase: { operator: '===', value: 'test' } }
+      },
+      {
+        id: 2,
+        type: 'text',
+        label: 'Text Field',
+        placeholder: 'Enter text type here',
+        value: '',
+        conditionnal: { ofInput: 1, inCase: { operator: '===', value: 'test2' } }
+      },
+      {
+        id: 3,
+        type: 'text',
+        label: 'Text Field',
+        placeholder: 'Enter text type here',
+        value: '',
+        conditionnal: { ofInput: 2, inCase: { operator: '===', value: 'test3' } }
+      }
+    ]
   })
   fieldsInfos!: Array<FieldObject>
-
+  
   @Prop({ type: Array, default: () => [] })
   customInputs!: Array<object>
-
+  
   @Prop({ 
     default: () => ({
       classesName: {
@@ -135,18 +100,18 @@ export default class VueFormCondionnalRendering extends Vue {
     }) 
   })
   config!: ConfigObject
-
+  
   // --------------------- 
   // ------- DATA --------
   storeResult:StoreResult = this.initStoreResult()
-
+  
   // ---------------------
   // ------ utilities ----
-
-
+  
+  
   // --------------------- 
   // ------- METHODS -----
-
+  
   /**
    * Init Store Result object.
    */
@@ -172,40 +137,81 @@ export default class VueFormCondionnalRendering extends Vue {
       }
     })
   }
-
+  
   getConditionnalParams ({conditionnal}:FieldObject): Array<any> | null {
     return (conditionnal)
-      ? [
-        this.storeResult[conditionnal.ofInput],
-        conditionnal.inCase.operator,
-        conditionnal.inCase.value
-      ]
-      : null
+    ? [
+      this.storeResult[conditionnal.ofInput],
+      conditionnal.inCase.operator,
+      conditionnal.inCase.value
+    ]
+    : null
   }
-
+  
   isFieldCall (field:FieldObject) {
     return this.operator.apply(this, this.getConditionnalParams(field))
   }
   
   get flow () {
     return this.fieldsInfos
-      // On map une première fois pour definir isCall  
-      .map((field, index, arr) => {
-        const conditionnal = field.conditionnal
-        const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
-        const thisIsCall = conditionnal ? this.isFieldCall(field): false
-        const relatedIsCall = related ? this.isFieldCall(related) : false
-        return {
-          ...field,
-          order: index,
-          isCall: (conditionnal)
-            ? thisIsCall && ((related && related.conditionnal)
-                ? relatedIsCall
-                : thisIsCall)
-            : true
+    // On map une première fois pour definir isCall  
+    .map((field, index, arr) => {
+      const conditionnal = field.conditionnal
+      const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
+      const thisIsCall = conditionnal ? this.isFieldCall(field): false
+      const relatedIsCall = related ? this.isFieldCall(related) : false
+      return {
+        ...field,
+        order: index,
+        isCall: (conditionnal)
+          ? thisIsCall && ((related && related.conditionnal)
+            ? relatedIsCall
+            : thisIsCall)
+          : true
+      }
+    })
+  }
+  
+  formConditionnalRendering (h:any) {
+    const { formCls, formContainerCls, formContainerFieldSetCls } = this.config.classesName
+    return (
+      <form class={formCls}>
+        {/* FORM CONDITIONAL RENDERING */
+          this.flow.map((f) => (
+            <div class={formContainerCls}>
+            {/* FCR-HEADER SLOT */}
+            { this.$slots.formHeader }
+
+            <fieldset key={f.id} v-show={f.isCall}  class={formContainerFieldSetCls}>
+              <label for={f.id}> { f.label } </label>
+              {
+                this.storeResult 
+                  ? <input
+                    id={f.id}
+                    type="text"
+                    on-input={(e:InputEvent) => { this.storeResult[f.id] = e.currentTarget.value} }
+                    value={this.storeResult[f.id]}
+                    placeholder={f.placeholder} />
+                  : null
+              }
+            </fieldset>
+            {/* FCR-FOOTER SLOT */}
+            { this.$slots.formFooter }
+          </div>
+          ))
         }
-      })
-      // .sort((a, b) => (a.conditionnal - b.conditionnal || b.is_conditionnal - a.is_conditionnal || a.order - b.order ))
-      
+      </form>
+    )
+  }
+
+  render (h:any) {
+    const { containerCls } = this.config.classesName
+    return (
+     <section class={containerCls}>
+      { this.$slots.header}
+      { this.formConditionnalRendering(h) }
+      { this.$slots.footer} 
+     </section> 
+    )
   }
 }
