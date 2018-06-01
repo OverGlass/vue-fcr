@@ -27,6 +27,17 @@ import _isArray from 'lodash/isArray'
     [key:string]: any 
   }
 
+  interface ClassesNameObject {
+    containerCls: Array<string>,
+    formCls: Array<string>,
+    formContainerCls: Array<string>,
+    formContainerFieldSetCls: Array<string>
+  }
+
+  interface ConfigObject {
+    classesName: ClassesNameObject
+  }
+
   declare type InputEvent = Event & {currentTarget: HTMLInputElement};
 
 const slug = (text:string):string => {
@@ -42,34 +53,37 @@ const slug = (text:string):string => {
 export default class VueFormCondionnalRendering extends Vue {
 
   render (h:any) {
+    const { containerCls, formCls, formContainerCls, formContainerFieldSetCls } = this.config.classesName
     return (
-     <section>
+     <section class={containerCls}>
       {/* HEADER SLOT */}
       { this.$slots.header}
+      
+      <form class={formCls}>
+        {/* FORM CONDITIONAL RENDERING */
+          this.flow.map((f) => (
+          <div class={formContainerCls}>
+            {/* FCR-HEADER SLOT */}
+            { this.$slots.inputHeader }
 
-      {/* FORM CONDITIONAL RENDERING */
-        this.flow.map((f) => (
-        <div class="FcrContainer">
-          {/* FCR-HEADER SLOT */}
-          { this.$slots.fcrHeader }
-
-          <fieldset key={f.id} v-show={f.isCall}>
-            <label for={f.id}> { f.label } </label>
-            {
-              this.storeResult 
-                ? <input
-                    id={f.id}
-                    type="text"
-                    on-input={(e:InputEvent) => { this.storeResult[f.id] = e.currentTarget.value}}
-                    value={this.storeResult[f.id]}
-                    placeholder={f.placeholder} />
-                : null
-            }
-          </fieldset>
-        </div>
-        )
-        )
-      }
+            <fieldset key={f.id} v-show={f.isCall}  class={formContainerFieldSetCls}>
+              <label for={f.id}> { f.label } </label>
+              {
+                this.storeResult 
+                  ? <input
+                      id={f.id}
+                      type="text"
+                      on-input={(e:InputEvent) => { this.storeResult[f.id] = e.currentTarget.value}}
+                      value={this.storeResult[f.id]}
+                      placeholder={f.placeholder} />
+                  : null
+              }
+            </fieldset>
+          </div>
+          ))
+        }
+      </form>
+        { this.$slots.footer} 
      </section> 
     )
   }
@@ -113,12 +127,14 @@ export default class VueFormCondionnalRendering extends Vue {
   @Prop({ 
     default: () => ({
       classesName: {
-        main: 'Container',
-        header: 'Container-header'
+        containerCls: ['Fcr'],
+        formCls: ['Fcr-form'],
+        formContainerCls: ['Fcr-form-container'],
+        formContainerFieldSetCls: ['Fcr-form-container-fieldset']
       }
     }) 
   })
-  config!: object
+  config!: ConfigObject
 
   // --------------------- 
   // ------- DATA --------
