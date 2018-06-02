@@ -1,59 +1,20 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
-// import { varNameToString } from '../lib'
+import { slug } from '../lib'
 import _find from 'lodash/find'
 import _pick from 'lodash/pick'
 import _isArray from 'lodash/isArray'
-
-  interface inCase {
-    operator: string
-    value: any  
-  }
-  
-  interface conditionnalObject {
-    ofInput: string
-    inCase: inCase 
-  }
-  interface FieldObject {
-    id: string
-    type: string
-    label: string
-    placeholder: string
-    value: any
-    conditionnal: conditionnalObject | false
-    [key: string]: any
-  }
-  
-  interface StoreResult {
-    [key:string]: any 
-  }
-
-  interface ClassesNameObject {
-    containerCls: Array<string>,
-    formCls: Array<string>,
-    formContainerCls: Array<string>,
-    formContainerFieldSetCls: Array<string>
-  }
-
-  interface ConfigObject {
-    classesName: ClassesNameObject
-  }
-
-  declare type InputEvent = Event & {currentTarget: HTMLInputElement};
-
-const slug = (text:string):string => {
-  return text.toString().toLowerCase()
-    .replace(/\s+/g, '-')           // Replace spaces with -
-    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-    .replace(/^-+/, '')             // Trim - from start of text
-    .replace(/-+$/, '');            // Trim - from end of text
-}
 
 @Component
 export default class VueFormCondionnalRendering extends Vue {
 
   // --------------------- 
-  // ------- PROPS -------
+  /**
+   * props for all informations
+   * about fields data and condition
+   *
+   * @type {Array<FieldObject>}
+   * @memberof VueFormCondionnalRendering
+   */
   @Prop({
     type: Array,
     default: () => [
@@ -85,10 +46,35 @@ export default class VueFormCondionnalRendering extends Vue {
     ]
   })
   fieldsInfos!: Array<FieldObject>
-  
-  @Prop({ type: Array, default: () => [] })
-  customInputs!: Array<object>
-  
+
+  /**
+   * prop for customs inputs
+   * Element or component that 
+   * accept v-model
+   * @type {Array<CustomInput>}
+   * @memberof VueFormCondionnalRendering
+   */
+  @Prop({
+    type: Array,
+    default: () => [
+      {
+        type: 'select',
+        element: 'input',
+        props: {
+          name: ':id',
+          payload: { title: ':label', items: ':options' }
+        }
+      }
+    ]
+  })
+  customInputs!: Array<CustomInputs>
+
+  /**
+   * Contain aside configuration
+   * like style and some behaviour
+   * @type {ConfigObject}
+   * @memberof VueFormCondionnalRendering
+   */
   @Prop({ 
     default: () => ({
       classesName: {
@@ -102,22 +88,35 @@ export default class VueFormCondionnalRendering extends Vue {
   config!: ConfigObject
   
   // --------------------- 
-  // ------- DATA --------
+  /**
+   * Store the form responses by fields id
+   *
+   * @type {StoreResult}
+   * @memberof VueFormCondionnalRendering
+   */
   storeResult:StoreResult = this.initStoreResult()
-  
-  // ---------------------
-  // ------ utilities ----
-  
-  
+
   // --------------------- 
   // ------- METHODS -----
   
-  /**
+   /**
    * Init Store Result object.
+   *
+   * @returns {object}
+   * @memberof VueFormCondionnalRendering
    */
   initStoreResult (): object {
     return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.value})))
   }
+  /**
+   * Do some operation between two values
+   *
+   * @param {*} value
+   * @param {string} op
+   * @param {*} b
+   * @returns {boolean}
+   * @memberof VueFormCondionnalRendering
+   */
   operator (value:any, op:string, b:any): boolean {
     if (!op) return true
     if (!_isArray(value)) value = [value]
@@ -137,21 +136,39 @@ export default class VueFormCondionnalRendering extends Vue {
       }
     })
   }
-  
+  /**
+   * Get flatten conditionnal params of fieldObject
+   * 
+   * @param {FieldObject} {conditionnal}
+   * @returns {(Array<any> | null)}
+   * @memberof VueFormCondionnalRendering
+   */
   getConditionnalParams ({conditionnal}:FieldObject): Array<any> | null {
     return (conditionnal)
-    ? [
-      this.storeResult[conditionnal.ofInput],
-      conditionnal.inCase.operator,
-      conditionnal.inCase.value
-    ]
-    : null
+      ? [
+        this.storeResult[conditionnal.ofInput],
+        conditionnal.inCase.operator,
+        conditionnal.inCase.value
+      ]
+      : null
   }
-  
+  /**
+   * Know if one field isCall
+   *
+   * @param {FieldObject} field
+   * @returns
+   * @memberof VueFormCondionnalRendering
+   */
   isFieldCall (field:FieldObject) {
     return this.operator.apply(this, this.getConditionnalParams(field))
   }
-  
+
+  /**
+   * Map fieldsInfos to know which field is call
+   *
+   * @readonly
+   * @memberof VueFormCondionnalRendering
+   */
   get flow () {
     return this.fieldsInfos
     // On map une première fois pour definir isCall  
@@ -171,7 +188,14 @@ export default class VueFormCondionnalRendering extends Vue {
       }
     })
   }
-  
+  /**
+   * Rendering the form with data flow
+   * with the isCall condition bool prop
+   * set custom style and slots
+   * @param {*} h
+   * @returns
+   * @memberof VueFormCondionnalRendering
+   */
   formConditionnalRendering (h:any) {
     const { formCls, formContainerCls, formContainerFieldSetCls } = this.config.classesName
     return (
