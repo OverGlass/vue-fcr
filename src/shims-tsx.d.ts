@@ -46,10 +46,14 @@ declare global {
     classesName: ClassesNameObject
   }
 
-  interface CustomInputs       {
+  interface CustomInputs {
     type: string | Array<string>,
-    element: string,
-    component: object,
+    element: string | false,
+    component: object | false,
+    [key: string]: any
+    attrs: {
+      [elem: string]: any
+    }
     props: {
       [elem: string]: any
     }

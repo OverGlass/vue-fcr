@@ -1,10 +1,18 @@
+// random salt prop inject
+
+// Je fesait l'import des attrs
+import { VNode } from 'vue'
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { slug } from '../lib'
-import _find from 'lodash/find'
-import _pick from 'lodash/pick'
-import _isArray from 'lodash/isArray'
+import { isEmpty, isArray, find, isString, isObject, get, mapValues, cloneDeep } from 'lodash'
+import InputRenderer from './InputRenderer'
 
-@Component
+
+// options operator
+
+@Component({
+  components: { InputRenderer }
+})
 export default class VueFormCondionnalRendering extends Vue {
 
   // --------------------- 
@@ -18,30 +26,45 @@ export default class VueFormCondionnalRendering extends Vue {
   @Prop({
     type: Array,
     default: () => [
-      { id: 0, type: 'text', label: 'Text Field', placeholder: 'Enter text type here', value: '', conditionnal: false },
+      { 
+        id: 0,
+        type: 'number',
+        defaultValue: 5,
+        conditionnal: false,
+        data: {
+            label: 'Text Field',
+            placeholder: 'Enter text type here' 
+        }
+      },
       {
         id: 1,
         type: 'text',
-        label: 'Text Field',
-        placeholder: 'Enter text type here',
-        value: 'test2',
-        conditionnal: { ofInput: 0, inCase: { operator: '===', value: 'test' } }
+        defaultValue: 'test2',
+        conditionnal: { ofInput: 0, inCase: { operator: '==', value: 10 } },
+        data: {
+          label: 'Text Field',
+          placeholder: 'Enter text type here' 
+        }
       },
       {
         id: 2,
         type: 'text',
-        label: 'Text Field',
-        placeholder: 'Enter text type here',
-        value: '',
-        conditionnal: { ofInput: 1, inCase: { operator: '===', value: 'test2' } }
+        defaultValue: '',
+        conditionnal: { ofInput: 1, inCase: { operator: '===', value: 'test2' } },
+        data: {
+          label: 'Text Field',
+          placeholder: 'Enter text type here' 
+        }
       },
       {
         id: 3,
         type: 'text',
-        label: 'Text Field',
-        placeholder: 'Enter text type here',
-        value: '',
-        conditionnal: { ofInput: 2, inCase: { operator: '===', value: 'test3' } }
+        defaultValue: '',
+        conditionnal: { ofInput: 2, inCase: { operator: '===', value: 'test3' } },
+        data: {
+          label: 'Text Field',
+          placeholder: 'Enter text type here' 
+        }
       }
     ]
   })
@@ -58,11 +81,28 @@ export default class VueFormCondionnalRendering extends Vue {
     type: Array,
     default: () => [
       {
-        type: 'select',
+        type: 'number',
         element: 'input',
+        component: false,
+        attrs: {
+          title: 'number filed',
+          type: 'number',
+          placeholder: ':placeholder'
+        },
         props: {
           name: ':id',
+          type: 'number',
           payload: { title: ':label', items: ':options' }
+        }
+      },
+      {
+        type: 'text',
+        element: 'input',
+        component: false,
+        attrs: false,
+        props: {
+          name: ':id',
+          payload: { title: 'label', items: 'options' }
         }
       }
     ]
@@ -106,7 +146,7 @@ export default class VueFormCondionnalRendering extends Vue {
    * @memberof VueFormCondionnalRendering
    */
   initStoreResult (): object {
-    return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.value})))
+    return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.defaultValue})))
   }
   /**
    * Do some operation between two values
@@ -119,7 +159,7 @@ export default class VueFormCondionnalRendering extends Vue {
    */
   operator (value:any, op:string, b:any): boolean {
     if (!op) return true
-    if (!_isArray(value)) value = [value]
+    if (!isArray(value)) value = [value]
     if (value.length === 0) return false
     return value.some((a:any) => {
       if (typeof a === 'string' && typeof b === 'string') {
@@ -128,6 +168,7 @@ export default class VueFormCondionnalRendering extends Vue {
       }
       switch (op) {
         case '===': return a === b
+        case '==': return a == b
         case '>': return a > b
         case '>=': return a >= b
         case '<': return a < b
@@ -174,7 +215,7 @@ export default class VueFormCondionnalRendering extends Vue {
     // On map une première fois pour definir isCall  
     .map((field, index, arr) => {
       const conditionnal = field.conditionnal
-      const related = conditionnal ? _find(arr, ({id}) => id === conditionnal.ofInput) : false
+      const related = conditionnal ? find(arr, ({id}) => id === conditionnal.ofInput) : false
       const thisIsCall = conditionnal ? this.isFieldCall(field) : false
       const relatedIsCall = related ? this.isFieldCall(related) : false
       return {
@@ -188,6 +229,8 @@ export default class VueFormCondionnalRendering extends Vue {
       }
     })
   }
+
+ 
   /**
    * Rendering the form with data flow
    * with the isCall condition bool prop
@@ -196,7 +239,7 @@ export default class VueFormCondionnalRendering extends Vue {
    * @returns
    * @memberof VueFormCondionnalRendering
    */
-  formConditionnalRendering (h:any) {
+  formConditionnalRendering (h:VNode) {
     const { formCls, formContainerCls, formContainerFieldSetCls } = this.config.classesName
     return (
       <form class={formCls}>
@@ -209,13 +252,13 @@ export default class VueFormCondionnalRendering extends Vue {
             <fieldset key={f.id} v-show={f.isCall}  class={formContainerFieldSetCls}>
               <label for={f.id}> { f.label } </label>
               {
-                this.storeResult 
-                  ? <input
-                    id={f.id}
-                    type="text"
-                    on-input={(e:InputEvent) => { this.storeResult[f.id] = e.currentTarget.value} }
-                    value={this.storeResult[f.id]}
-                    placeholder={f.placeholder} />
+                this.storeResult
+                  ? <input-renderer 
+                      field={f}
+                      customInputs={this.customInputs}
+                      on-input={(value:any) => { this.storeResult[f.id] = value }}
+                      value={this.storeResult[f.id]}
+                    />
                   : null
               }
             </fieldset>
@@ -227,8 +270,14 @@ export default class VueFormCondionnalRendering extends Vue {
       </form>
     )
   }
-
-  render (h:any) {
+/**
+ *
+ *
+ * @param {VNode} h
+ * @returns jsx
+ * @memberof VueFormCondionnalRendering
+ */
+render (h:VNode) {
     const { containerCls } = this.config.classesName
     return (
      <section class={containerCls}>
