@@ -121,7 +121,7 @@ export default class VueFormCondionnalRendering extends Vue {
         containerCls: ['Fcr'],
         formCls: ['Fcr-form'],
         formContainerCls: ['Fcr-form-container'],
-        formContainerFieldSetCls: ['Fcr-form-container-fieldset']
+        formInputContainerCls: ['Fcr-form-input-container']
       }
     }) 
   })
@@ -240,7 +240,7 @@ export default class VueFormCondionnalRendering extends Vue {
    * @memberof VueFormCondionnalRendering
    */
   formConditionnalRendering (h:VNode) {
-    const { formCls, formContainerCls, formContainerFieldSetCls } = this.config.classesName
+    const { formCls, formContainerCls, formInputContainerCls } = this.config.classesName
     return (
       <form class={formCls}>
         {/* FORM CONDITIONAL RENDERING */
@@ -249,8 +249,8 @@ export default class VueFormCondionnalRendering extends Vue {
             {/* FCR-HEADER SLOT */}
             { this.$slots.formHeader }
 
-            <fieldset key={f.id} v-show={f.isCall}  class={formContainerFieldSetCls}>
-              <label for={f.id}> { f.label } </label>
+            <div key={f.id} v-show={f.isCall}  class={formInputContainerCls}>
+              { this.$slots.formInputHeader }
               {
                 this.storeResult
                   ? <input-renderer 
@@ -261,7 +261,8 @@ export default class VueFormCondionnalRendering extends Vue {
                     />
                   : null
               }
-            </fieldset>
+              { this.$slots.formInputFooter }
+            </div>
             {/* FCR-FOOTER SLOT */}
             { this.$slots.formFooter }
           </div>

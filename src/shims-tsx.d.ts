@@ -24,9 +24,8 @@ declare global {
   interface FieldObject {
     id: string
     type: string
-    label: string
-    placeholder: string
-    value: any
+    defaultValue: any
+    data: Object,
     conditionnal: conditionnalObject | false
     [key: string]: any
   }
@@ -39,7 +38,7 @@ declare global {
     containerCls: Array<string>,
     formCls: Array<string>,
     formContainerCls: Array<string>,
-    formContainerFieldSetCls: Array<string>
+    formInputContainerCls: Array<string>
   }
 
   interface ConfigObject {
