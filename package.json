@@ -1,6 +1,14 @@
 {
   "name": "vue-fcr",
+  "main": "main.ts",
   "version": "0.1.0",
+  "contributors": [
+    {
+      "name": "Antonin Carlin",
+      "email": "antonin@221.rocks",
+      "web": "antonincarlin.com"
+    }
+  ],
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --open",
