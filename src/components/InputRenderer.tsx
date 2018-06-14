@@ -30,7 +30,7 @@ export default class InputRenderer extends Vue {
   })
   field!:FieldObject
 
-  @Prop({})
+  @Prop({ type: [String, Number, Array, Object, Symbol] })
   value!:any
 
   @Prop({

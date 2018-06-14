@@ -2,9 +2,10 @@
 
 // Je fesait l'import des attrs
 import { VNode } from 'vue'
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch, Emit } from 'vue-property-decorator';
 import { slug } from '../lib'
-import { isEmpty, isArray, find, isString, isObject, get, mapValues, cloneDeep } from 'lodash'
+import { Throttle } from 'lodash-decorators';
+import { isEmpty, isArray, find, isString, isObject, get, mapValues, cloneDeep  } from 'lodash'
 import InputRenderer from './InputRenderer'
 
 
@@ -148,6 +149,14 @@ export default class VueFormCondionnalRendering extends Vue {
   initStoreResult (): object {
     return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.defaultValue})))
   }
+
+  @Throttle(16)
+  setStore(id:string|number, data:any) {
+      this.storeResult[id] = data
+      if ( Object.keys(this.storeResult).length > 0) {
+        this.$emit('output', this.storeResult)
+      }
+  } 
   /**
    * Do some operation between two values
    *
@@ -162,7 +171,7 @@ export default class VueFormCondionnalRendering extends Vue {
     if (!isArray(value)) value = [value]
     if (value.length === 0) return false
     return value.some((a:any) => {
-      if (typeof a === 'string' && typeof b === 'string') {
+      if (isString(a) && isString(b)) {
         a = slug(a)
         b = slug(b)
       }
@@ -256,7 +265,7 @@ export default class VueFormCondionnalRendering extends Vue {
                   ? <input-renderer 
                       field={f}
                       customInputs={this.customInputs}
-                      on-input={(value:any) => { this.storeResult[f.id] = value }}
+                      on-input={(value:any) => { this.setStore(f.id, value) }}
                       value={this.storeResult[f.id]}
                     />
                   : null
