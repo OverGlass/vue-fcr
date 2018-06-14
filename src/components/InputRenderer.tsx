@@ -1,7 +1,7 @@
 import { VNode } from 'vue'
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { slug } from '../lib'
-import { isEmpty, isArray, find, isString, isObject, get, mapValues, cloneDeep } from 'lodash'
+import { Throttle } from 'lodash-decorators';
+import { isEmpty, isArray, find, isString, isObject, get, mapValues } from 'lodash'
 
 @Component
 export default class InputRenderer extends Vue {
@@ -102,6 +102,10 @@ export default class InputRenderer extends Vue {
     })
     return maping(props, data)
   }
+  @Throttle(128)
+  emitInput(value:any) {
+    this.$emit('input', value) 
+  }
 
   render (h:VNode) {
     const input = this.getInputByType(this.field.type)
@@ -121,7 +125,7 @@ export default class InputRenderer extends Vue {
       return (
           <input.element
             { ...propsAndattrs }
-            on-input={(e:InputEvent) => { this.$emit('input', e.currentTarget.value)} }
+            on-input={(e:InputEvent) => { this.emitInput(e.currentTarget.value)} }
             value={this.value}
           />
       )

@@ -2,10 +2,10 @@
 
 // Je fesait l'import des attrs
 import { VNode } from 'vue'
-import { Component, Vue, Prop, Watch, Emit } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { slug } from '../lib'
 import { Throttle } from 'lodash-decorators';
-import { isEmpty, isArray, find, isString, isObject, get, mapValues, cloneDeep  } from 'lodash'
+import { isArray, find, isString } from 'lodash'
 import InputRenderer from './InputRenderer'
 
 
