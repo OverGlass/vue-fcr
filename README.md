@@ -1,12 +1,11 @@
 # vue-fcr
 
-> A native Vue.js form conditionnal rendering component that provides similar functionality to typeform in futur
+> A Vue.js form conditionnal rendering component that will provides similar functionality to typeform
 
 #### Features
-- Import any components/elements in your form as input easly
+- Import any components/elements in your form as input 
 - Automatic conditionnal rendering
-- Link yours components with your data easly
-- Fast to configure
+- Link your components with your data easly
 
 
 ## Install
@@ -93,28 +92,4 @@ You may now use the component in your markup
         formInputContainerCls: ['Fcr-form-input-container']
     }
   }" />
-```
-
-#### CDN
-
-Just include `vue` & `vue-select.js` - I recommend using [unpkg](https://unpkg.com/#/).
-
-```html
-<script src="https://unpkg.com/vue@latest"></script>
-<!-- use the latest release -->
-<script src="https://unpkg.com/vue-select@latest"></script>
-<!-- or point to a specific release -->
-<script src="https://unpkg.com/vue-select@1.3.3"></script>
-```
-
-Then register the component in your javascript:
-
-```js
-Vue.component('v-select', VueSelect.VueSelect);
-```
-
-You may now use the component in your markup
-
-```html
-<v-select v-model="selected" :options="['foo','bar']"></v-select>
 ```
