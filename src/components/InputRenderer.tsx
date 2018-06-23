@@ -117,14 +117,15 @@ export default class InputRenderer extends Vue {
 
   render (h:VNode) {
     const input = this.getInputByType(this.field.type)
+    const InputComponent:any = input.component
     const getPropsOrattrs = (key:string) => this.injectDataToProps(input[key], this.field.data)
     const propsAndattrs = {
       props: getPropsOrattrs('props'),
       attrs: getPropsOrattrs('attrs')
     }
-    if (input.component) {
+    if (InputComponent) {
       return (
-        <component
+        <InputComponent
           { ...propsAndattrs }
           is={input.component}
         />

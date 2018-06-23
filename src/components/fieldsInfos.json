@@ -1,0 +1,44 @@
+[
+  {
+    "id": 0,
+    "type": "number",
+    "defaultValue": 5,
+    "conditionnal": false,
+    "data": {
+      "label": "Text Field",
+      "placeholder": "Enter text type here"
+    }
+  },
+  {
+    "id": 1,
+    "type": "text",
+    "defaultValue": "test2",
+    "conditionnal": {
+      "ofInput": 0,
+      "inCase": {
+        "operator": "==",
+        "value": 10
+      }
+    },
+    "data": {
+      "label": "Text Field",
+      "placeholder": "Enter text type here"
+    }
+  },
+  {
+    "id": 2,
+    "type": "select",
+    "defaultValue": "",
+    "conditionnal": {
+      "ofInput": 1,
+      "inCase": {
+        "operator": "===",
+        "value": "test2"
+      }
+    },
+    "data": {
+      "label": "Text Field",
+      "placeholder": "Enter text type here"
+    }
+  }
+]
