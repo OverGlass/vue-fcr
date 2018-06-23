@@ -1,7 +1,7 @@
 {
   "name": "vue-fcr",
   "main": "./dist/vue-fcr.common.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/OverGlass/vue-fcr",
   "contributors": [
     {
@@ -13,14 +13,15 @@
   "scripts": {
     "serve": "vue-cli-service serve --open",
     "build": "vue-cli-service build",
-    "build-bundle": "vue-cli-service build --target lib --report --name vue-fcr 'src/components/VueFcr.tsx'"
+    "build-bundle": "vue-cli-service build --target lib --report --name vue-fcr 'src/components/index.ts'"
   },
   "dependencies": {
-    "vue": "^2.5.16"
+    "v-select": "^0.0.1",
+    "vue": "^2.5.16",
+    "vue-select": "^2.4.0"
   },
   "devDependencies": {
-    "vue-property-decorator": "^6.0.0",
-    "vue-class-component": "^6.0.0",
+    "@types/lodash": "^4.14.110",
     "@vue/cli-plugin-babel": "^3.0.0-beta.11",
     "@vue/cli-plugin-typescript": "^3.0.0-beta.11",
     "@vue/cli-service": "^3.0.0-beta.11",
@@ -32,6 +33,10 @@
     "lodash-decorators": "^5.0.1",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "vue-class-component": "^6.0.0",
+    "vue-property-decorator": "^6.0.0",
     "vue-template-compiler": "^2.5.16"
   },
   "browserslist": [
@@ -45,5 +50,5 @@
     "public/*",
     "*.json",
     "*.ts"
- ]
+  ]
 }

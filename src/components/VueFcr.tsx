@@ -1,12 +1,11 @@
 // random salt prop inject
 
 import { VNode } from 'vue'
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { slug } from '../lib'
 import isArray from 'lodash/isArray'
 import find from 'lodash/find'
 import isString from 'lodash/isString'
-import throttle from 'lodash/throttle'
 import InputRenderer from './InputRenderer'
 
 
@@ -121,13 +120,16 @@ export default class VueFormCondionnalRendering extends Vue {
     default: () => ({
       classesName: {
         containerCls: ['Fcr'],
-        formCls: ['Fcr-form'],
-        formContainerCls: ['Fcr-form-container'],
-        formInputContainerCls: ['Fcr-form-input-container']
+        formContainerCls: ['Fcr-container'],
       }
     }) 
   })
   config!: ConfigObject
+
+  @Prop({
+    default: null
+  })
+  input!: StoreResult
   
   // --------------------- 
   /**
@@ -137,6 +139,7 @@ export default class VueFormCondionnalRendering extends Vue {
    * @memberof VueFormCondionnalRendering
    */
   storeResult:StoreResult = this.initStoreResult()
+  storeIsInit:Boolean = false
 
   // --------------------- 
   // ------- METHODS -----
@@ -147,18 +150,20 @@ export default class VueFormCondionnalRendering extends Vue {
    * @returns {object}
    * @memberof VueFormCondionnalRendering
    */
-  initStoreResult (): object {
-    return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.defaultValue})))
+  initStoreResult () {
+      return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.defaultValue})))
   }
 
-  get setStore() {
-    return throttle((id:string|number, data:any) => {
-        this.storeResult[id] = data
-        if ( Object.keys(this.storeResult).length > 0) {
-          this.$emit('output', this.storeResult)
-        }
-      }, 16)
-  } 
+  @Watch('storeResult', { immediate: true, deep: true })
+  onStoreChange () {
+    this.$emit('output', this.storeResult)
+  }
+
+  @Watch('input')
+  onInputChange () {
+    if (this.input) this.storeResult = this.input
+  }
+
   /**
    * Do some operation between two values
    *
@@ -251,33 +256,30 @@ export default class VueFormCondionnalRendering extends Vue {
    * @memberof VueFormCondionnalRendering
    */
   formConditionnalRendering (h:VNode) {
-    const { formCls, formContainerCls, formInputContainerCls } = this.config.classesName
+    const { formCls, formInputContainerCls } = this.config.classesName
     return (
       <form class={formCls}>
         {/* FORM CONDITIONAL RENDERING */
-          this.flow.map((f) => (
-            <div class={formContainerCls}>
-            {/* FCR-HEADER SLOT */}
-            { this.$slots.formHeader }
-
-            <div key={f.id} v-show={f.isCall}  class={formInputContainerCls}>
-              { this.$slots.formInputHeader }
-              {
-                this.storeResult
-                  ? <input-renderer 
-                      field={f}
-                      customInputs={this.customInputs}
-                      on-input={(value:any) => { this.setStore(f.id, value) }}
-                      value={this.storeResult[f.id]}
-                    />
-                  : null
-              }
-              { this.$slots.formInputFooter }
-            </div>
-            {/* FCR-FOOTER SLOT */}
-            { this.$slots.formFooter }
-          </div>
-          ))
+         !this.$scopedSlots.default
+          ? this.flow.map((f) => (
+              <div key={f.id} v-show={f.isCall}  class={formInputContainerCls}>
+                {
+                  this.storeResult
+                    ? <input-renderer 
+                        field={f}
+                        customInputs={this.customInputs}
+                        on-input={(value:any) => { this.storeResult[f.id] = value }}
+                        value={this.storeResult[f.id]}
+                      />
+                    : null
+                }
+              </div>
+            ))
+          : this.$scopedSlots.default({
+            dataFlow: this.flow,
+            storeResult: this.storeResult,
+            customInputs: this.customInputs
+          })
         }
       </form>
     )
