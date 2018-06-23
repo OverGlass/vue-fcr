@@ -1,11 +1,12 @@
 // random salt prop inject
 
-// Je fesait l'import des attrs
 import { VNode } from 'vue'
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { slug } from '../lib'
-import { Throttle } from 'lodash-decorators';
-import { isArray, find, isString } from 'lodash'
+import isArray from 'lodash/isArray'
+import find from 'lodash/find'
+import isString from 'lodash/isString'
+import throttle from 'lodash/throttle'
 import InputRenderer from './InputRenderer'
 
 
@@ -150,12 +151,13 @@ export default class VueFormCondionnalRendering extends Vue {
     return Object.assign({}, ...this.fieldsInfos.map(item => ({[item.id]: item.defaultValue})))
   }
 
-  @Throttle(16)
-  setStore(id:string|number, data:any) {
-      this.storeResult[id] = data
-      if ( Object.keys(this.storeResult).length > 0) {
-        this.$emit('output', this.storeResult)
-      }
+  get setStore() {
+    return throttle((id:string|number, data:any) => {
+        this.storeResult[id] = data
+        if ( Object.keys(this.storeResult).length > 0) {
+          this.$emit('output', this.storeResult)
+        }
+      }, 16)
   } 
   /**
    * Do some operation between two values

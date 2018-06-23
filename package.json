@@ -12,15 +12,15 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --open",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "build-bundle": "vue-cli-service build --target lib --report --name vue-fcr 'src/components/VueFcr.tsx'"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.109",
-    "vue": "^2.5.16",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^6.0.0"
+    "vue": "^2.5.16"
   },
   "devDependencies": {
+    "vue-property-decorator": "^6.0.0",
+    "vue-class-component": "^6.0.0",
     "@vue/cli-plugin-babel": "^3.0.0-beta.11",
     "@vue/cli-plugin-typescript": "^3.0.0-beta.11",
     "@vue/cli-service": "^3.0.0-beta.11",
