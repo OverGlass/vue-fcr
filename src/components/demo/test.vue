@@ -21,8 +21,7 @@
   </vue-fcr>
 </template>
 <script>
-import VueFcr from './VueFcr.tsx'
-import InputRenderer from './InputRenderer.tsx'
+import { VueFcr, InputRenderer } from '../index.ts'
 const fieldsInfos = require('./fieldsInfos.json')
 import vSelect from 'vue-select'
 export default {
