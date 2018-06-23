@@ -1,7 +1,13 @@
 import { VNode } from 'vue'
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Throttle } from 'lodash-decorators';
-import { isEmpty, isArray, find, isString, isObject, get, mapValues } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import isArray from 'lodash/isArray'
+import find from 'lodash/find'
+import isString from 'lodash/isString'
+import isObject from 'lodash/isObject'
+import get from 'lodash/get'
+import mapValues from 'lodash/mapValues'
+import throttle from 'lodash/throttle'
 
 @Component
 export default class InputRenderer extends Vue {
@@ -102,9 +108,11 @@ export default class InputRenderer extends Vue {
     })
     return maping(props, data)
   }
-  @Throttle(128)
-  emitInput(value:any) {
-    this.$emit('input', value) 
+  
+  get emitInput() {
+    return throttle((value:any) => {
+      this.$emit('input', value) 
+    }, 128)
   }
 
   render (h:VNode) {
