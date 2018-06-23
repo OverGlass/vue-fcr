@@ -1,0 +1,49 @@
+{
+  "name": "vue-fcr",
+  "main": "./dist/vue-fcr.common.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/OverGlass/vue-fcr",
+  "contributors": [
+    {
+      "name": "Antonin Carlin",
+      "email": "antonin@221.rocks",
+      "web": "antonincarlin.com"
+    }
+  ],
+  "scripts": {
+    "serve": "vue-cli-service serve --open",
+    "build": "vue-cli-service build",
+    "build-bundle": "vue-cli-service build --target lib --report --name vue-fcr 'src/components/VueFcr.tsx'"
+  },
+  "dependencies": {
+    "vue": "^2.5.16"
+  },
+  "devDependencies": {
+    "vue-property-decorator": "^6.0.0",
+    "vue-class-component": "^6.0.0",
+    "@vue/cli-plugin-babel": "^3.0.0-beta.11",
+    "@vue/cli-plugin-typescript": "^3.0.0-beta.11",
+    "@vue/cli-service": "^3.0.0-beta.11",
+    "babel": "^6.0.0",
+    "babel-helper-vue-jsx-merge-props": "^2.0.3",
+    "babel-plugin-jsx-v-model": "^2.0.3",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-transform-vue-jsx": "^6.18.0",
+    "lodash-decorators": "^5.0.1",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.1",
+    "vue-template-compiler": "^2.5.16"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "files": [
+    "dist/*",
+    "src/*",
+    "public/*",
+    "*.json",
+    "*.ts"
+ ]
+}
