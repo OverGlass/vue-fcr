@@ -75,7 +75,7 @@ export default class InputRenderer extends Vue {
     element: 'input',
     component: false,
     attrs: {
-      title: 'text fild',
+      title: 'text fieeeeld',
       type: 'text'
     },
     props: {
