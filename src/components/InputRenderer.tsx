@@ -75,7 +75,7 @@ export default class InputRenderer extends Vue {
     element: 'input',
     component: false,
     attrs: {
-      title: 'text fild',
+      title: 'text fieeeeld',
       type: 'text'
     },
     props: {
@@ -99,11 +99,11 @@ export default class InputRenderer extends Vue {
 
   injectDataToProps (props:object, data:any):any {
     if (!props) return props
-    const maping = (props:object, data:any) :any => mapValues(props, (key /* props */) => {
+    const maping = (props:object, data:any) :any => mapValues(props, (key:any /* props */) => {
         return isObject(data)
           ? (isObject(key))
             ? maping(key, data)
-            : (this.isPropKey(key) ? get(data, key) : key)
+            : (this.isPropKey(key) ? get(data, key.substring(1)) : key)
           : undefined
     })
     return maping(props, data)
