@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueFcr from './components/demo/test.vue'
+import VueFcr from './components/demo/baseDemo.vue'
 
 Vue.config.productionTip = false
 
