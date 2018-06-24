@@ -99,11 +99,11 @@ export default class InputRenderer extends Vue {
 
   injectDataToProps (props:object, data:any):any {
     if (!props) return props
-    const maping = (props:object, data:any) :any => mapValues(props, (key /* props */) => {
+    const maping = (props:object, data:any) :any => mapValues(props, (key:any /* props */) => {
         return isObject(data)
           ? (isObject(key))
             ? maping(key, data)
-            : (this.isPropKey(key) ? get(data, key) : key)
+            : (this.isPropKey(key) ? get(data, key.substring(1)) : key)
           : undefined
     })
     return maping(props, data)
@@ -119,25 +119,16 @@ export default class InputRenderer extends Vue {
     const input = this.getInputByType(this.field.type)
     const InputComponent:any = input.component
     const getPropsOrattrs = (key:string) => this.injectDataToProps(input[key], this.field.data)
-    const propsAndattrs = {
+    const propsAttrsListeners = {
       props: getPropsOrattrs('props'),
-      attrs: getPropsOrattrs('attrs')
+      attrs: {...getPropsOrattrs('attrs'), value: this.value},
+      on: {...this.$listeners, input: (e:InputEvent) => { this.emitInput(e.currentTarget.value)}}
     }
     if (InputComponent) {
-      return (
-        <InputComponent
-          { ...propsAndattrs }
-          is={input.component}
-        />
-      )
+      return <InputComponent { ...propsAttrsListeners } />
+
     } else if (input.element) {
-      return (
-          <input.element
-            { ...propsAndattrs }
-            on-input={(e:InputEvent) => { this.emitInput(e.currentTarget.value)} }
-            value={this.value}
-          />
-      )
+      return <input.element { ...propsAttrsListeners } />
     }
 
   }
