@@ -2,11 +2,11 @@
   {
     "id": 0,
     "type": "number",
-    "defaultValue": 5,
+    "defaultValue": "",
     "conditionnal": false,
     "data": {
-      "label": "Text Field",
-      "placeholder": "Enter text type here"
+      "label": "Number Field",
+      "placeholder": "type 10"
     }
   },
   {
@@ -22,7 +22,7 @@
     },
     "data": {
       "label": "Text Field",
-      "placeholder": "Enter text type here"
+      "placeholder": "type test2"
     }
   },
   {

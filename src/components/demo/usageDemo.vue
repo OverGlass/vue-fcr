@@ -1,14 +1,15 @@
 <template>
-<div>
+<div @keydown="handleKey">
   <vue-fcr
     @output="data => fcrStore = data"
     :input="fcrStore"
     :fields-infos="fieldsInfos"
     :customInputs="customInputs"
     @keyup.enter.prevent="this.up = false"
+    style="display: flex; align-items: center; justify-content: center; height: 100vh"
   >
     <template slot-scope="{ dataFlow }">
-      <transition-group name="slide">
+      <transition-group name="slide" tag="div">
         <div
           v-for="(field) in (fullForm ? dataFlow : (stop ? moveCallList(dataFlow, up) : lastInputCall(dataFlow)))"
           :key="field.id"
@@ -16,17 +17,18 @@
         >
           <input-renderer
             :field="field"
+            v-focus
             v-model="fcrStore[field.id]"
             :customInputs="customInputs"
           />
         </div>
       </transition-group>
+      <button @click.prevent="triggerUp(true)">up</button>
+      <button @click.prevent="triggerUp(false)">down</button>
+      <button @click.prevent="stop = false">ok</button>
+      <button @click.prevent="fullForm = !fullForm">{{ fullForm ? 'hide' : 'show' }}</button>
     </template>
   </vue-fcr>
-  <button @click.prevent="triggerUp(true)">up</button>
-  <button @click.prevent="triggerUp(false)">down</button>
-  <button @click.prevent="stop = false">ok</button>
-  <button @click.prevent="fullForm = !fullForm">{{ fullForm ? 'hide' : 'show' }}</button>
 </div>
 </template>
 <script>
@@ -77,7 +79,22 @@ export default {
     ]
     }
   },
+  directives: {
+    focus: {
+      // définition de la directive
+      inserted: function (el) {
+        el.focus()
+      }
+    }
+  },
   methods: {
+    handleKey (event) {
+      if(event.shiftKey && event.keyCode == 9) {
+        this.triggerUp(true)
+      } else if (event.keyCode == 9) {
+         this.triggerUp(false)
+      }
+    },
     triggerUp (bool) {
       this.up = !bool
       this.stop = true
