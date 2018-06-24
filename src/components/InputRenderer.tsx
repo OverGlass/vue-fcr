@@ -122,7 +122,7 @@ export default class InputRenderer extends Vue {
     const propsAttrsListeners = {
       props: getPropsOrattrs('props'),
       attrs: {...getPropsOrattrs('attrs'), value: this.value},
-      on: {...this.$listeners, input: (e:InputEvent) => { this.emitInput(e.currentTarget.value)}}
+      on: {...this.$listeners, input: (e:InputEvent) => { this.emitInput(e.currentTarget ? e.currentTarget.value : e)}}
     }
     if (InputComponent) {
       return <InputComponent { ...propsAttrsListeners } />

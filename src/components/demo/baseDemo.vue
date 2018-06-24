@@ -5,7 +5,7 @@
     :fields-infos="fieldsInfos"
     :customInputs="customInputs"
   >
-    <template slot-scope="{ dataFlow }">
+    <template slot-scope="{ dataFlow, customInputs }">
       <div
         v-for="field in dataFlow"
         :key="field.id"
@@ -39,6 +39,15 @@ export default {
           type: 'number',
           placeholder: ':placeholder'
         },
+      },
+      {
+        type: 'text',
+        element: 'input',
+        attrs: {
+          title: ':label',
+          type: 'text',
+          placeholder: ':placeholder'
+        }
       },
       {
         type: 'select',
